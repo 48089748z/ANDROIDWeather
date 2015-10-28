@@ -1,8 +1,11 @@
 package com.example.poblenou.eltemps;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.*;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.*;
@@ -103,9 +106,13 @@ public class MainActivityFragment extends Fragment
 
     public void refresh()
     {
+        SharedPreferences preferencias = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        final String CITY = preferencias.getString("city", "Barcelona");
+        final String SISTEMA = preferencias.getString("units", "metric");
+        final int NUMDAYS = Integer.parseInt(preferencias.getString("numdays", "10"));
 
         final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/";
-        final String CITY = "Barcelona";
         final String APPID = "f3b53a805bc9ec413f57d26fdc30de46";
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -115,7 +122,7 @@ public class MainActivityFragment extends Fragment
 
         service = retrofit.create(OpenWeatherMapService.class);
 
-        Call<Forecast> call = service.dailyForecast(CITY, "json", "metric", 14, APPID);
+        Call<Forecast> call = service.dailyForecast(CITY, "json", SISTEMA, NUMDAYS, APPID);
         call.enqueue(new Callback<Forecast>()
         {
             @Override
